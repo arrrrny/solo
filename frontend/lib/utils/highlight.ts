@@ -25,7 +25,9 @@ export function buildValidNames(members: ChannelMember[]): string[] {
   return Array.from(new Set(
     members
       .filter((m) => m.member_type === 'user')
-      .map((m) => m.display_name.toLowerCase()),
+      .map((m) => m.display_name.toLowerCase())
+      // @here is a reserved broadcast mention and always highlights.
+      .concat('here'),
   ));
 }
 

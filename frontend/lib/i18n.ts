@@ -158,6 +158,7 @@ const en = {
   // ── Mention ──
   mentionSelect: 'Select member to mention',
   noMatchingMembers: 'No matching members',
+  mentionHereHint: 'Notify all agents in this channel',
 
   // ── Thread ──
   thread: 'Thread',
@@ -1100,6 +1101,7 @@ const zhCN = {
   templateApplyHint: 'Solo 会在一次事务中添加所有智能体、成员关系和团队关系。添加后仍可微调团队。',
   mentionSelect: '选择要提及的成员',
   noMatchingMembers: '没有匹配的成员',
+  mentionHereHint: '通知本频道内的所有 Agent',
   thread: '讨论串',
   threadReplies: '{n} 条回复',
   closeThreadPanel: '关闭讨论串面板',

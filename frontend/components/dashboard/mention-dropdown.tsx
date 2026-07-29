@@ -13,6 +13,7 @@ import { createPortal } from 'react-dom';
 import { Bot, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { t } from '@/lib/i18n';
+import { HERE_MENTION_ID } from '@/lib/hooks/use-mentions';
 import type { ChannelMember } from '@/lib/types';
 
 // ---- Types ----
@@ -74,6 +75,7 @@ export function MentionDropdown({
         <div ref={listRef} className="max-h-48 overflow-y-auto py-1">
           {suggestions.map((suggestion, index) => {
             const isAgent = suggestion.member.member_type === 'agent';
+            const isHere = suggestion.member.member_id === HERE_MENTION_ID;
             return (
               <button
                 key={suggestion.member.member_id}
@@ -103,10 +105,16 @@ export function MentionDropdown({
                 <span className="font-medium">
                   {suggestion.member.display_name}
                 </span>
-                {isAgent && (
+                {isHere ? (
                   <span className="ml-auto text-[10px] text-brutal-success">
-                    {t('agent')}
+                    {t('mentionHereHint')}
                   </span>
+                ) : (
+                  isAgent && (
+                    <span className="ml-auto text-[10px] text-brutal-success">
+                      {t('agent')}
+                    </span>
+                  )
                 )}
               </button>
             );

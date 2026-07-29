@@ -69,6 +69,21 @@ interface UseMentionsResult {
 
 const MENTION_REGEX = /@(\w*)$/;
 
+/**
+ * Reserved broadcast mention: @here notifies every agent in the channel.
+ * The pseudo member_id is safe because real member IDs are UUIDs.
+ */
+export const HERE_MENTION_ID = 'here';
+
+const HERE_MEMBER: ChannelMember = {
+  channel_id: '',
+  member_type: 'agent',
+  member_id: HERE_MENTION_ID,
+  role: 'member',
+  display_name: 'here',
+  status: 'offline',
+};
+
 // ---- Hook ----
 
 export function useMentions(
@@ -96,7 +111,7 @@ export function useMentions(
   const suggestions = useMemo(() => {
     if (!mentionMatch) return [];
 
-    return members
+    const matched = members
       .filter((m) =>
         m.display_name.toLowerCase().includes(mentionMatch.query),
       )
@@ -104,6 +119,17 @@ export function useMentions(
         member,
         matchText: mentionMatch.query,
       }));
+
+    // Offer the @here broadcast when the query is a prefix of "here" and the
+    // channel has at least one agent to notify.
+    if (
+      HERE_MENTION_ID.startsWith(mentionMatch.query) &&
+      members.some((m) => m.member_type === 'agent')
+    ) {
+      matched.unshift({ member: HERE_MEMBER, matchText: mentionMatch.query });
+    }
+
+    return matched;
   }, [members, mentionMatch]);
 
   const showSuggestions = suggestions.length > 0;
@@ -212,6 +238,18 @@ export function useMentions(
 
     while ((matchResult = globalRegex.exec(value)) !== null) {
       const m = matchResult;
+      // @here expands to every agent member of the channel.
+      if (m[1].toLowerCase() === HERE_MENTION_ID) {
+        for (const member of members) {
+          if (
+            member.member_type === 'agent' &&
+            !ids.includes(member.member_id)
+          ) {
+            ids.push(member.member_id);
+          }
+        }
+        continue;
+      }
       const member = members.find((mem) => mem.display_name === m[1]);
       if (
         member &&
